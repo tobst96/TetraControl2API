@@ -55,9 +55,7 @@ class TetraControlStatus():
         LOGDAT.error(str(ex))
         LOGGER.critical("Keine TetraControl Verbindung.")
         LOGGER.warning("Config nicht richtig eingestellt?")
-        LOGGER.error("tetracontrolstatus", "Starte ein neuen Versuch in 5 Sekunden")
-        time.sleep(5)
-        self.checkTC()
+
 
     def start(self):
         try:            
