@@ -19,7 +19,7 @@ def erroradd():
 
 def sendtoapi(value):
     try:
-        r = requests.get("http://192.168.2.35api/v1/statusserver/error/" + value, timeout=5)
+        r = requests.get("http://192.168.2.35/api/v1/statusserver/error/" + value, timeout=5)
         if r.status_code == 200:
             jsondata = {"error": 0}
             json.dump(jsondata,open('/var/StatusClient/StatusAPI/error.json','w'))

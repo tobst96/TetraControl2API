@@ -55,9 +55,7 @@ class TetraControlStatus():
         LOGDAT.error(str(ex))
         LOGGER.critical("Keine TetraControl Verbindung.")
         LOGGER.warning("Config nicht richtig eingestellt?")
-        LOGGER.error("Starte ein neuen Versuch in 5 Sekunden")
-        time.sleep(5)
-        self.checkTC()
+
 
     def start(self):
         try:            
@@ -89,9 +87,8 @@ class TetraControlStatus():
                 self.loadWhitelist()
 
             except Exception as ex:
-                LOGGER.error("API senden: " + str(ex))
+                LOGGER.error("tetracontrolstatus" +"API senden: " + str(ex))
                 
-                LOGGER.warning("Daten werden selber gesendet. Server reagiert nicht.")
                 erroradd()
                 self.loadWhitelist()
                 
@@ -99,7 +96,7 @@ class TetraControlStatus():
             
             self.jsonStatusList()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - readStatusJSON", str(ex))
@@ -124,7 +121,7 @@ class TetraControlStatus():
             file.write("\n" + str(jsondata))
             file.close()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - jsonStatusList", str(ex))
@@ -150,14 +147,14 @@ class TetraControlStatus():
                 LOGGER.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             if self.interval >= 20 and self.interval < 60:
-                LOGGER.error("TetraControl Abfrage letzten " + str(self.interval) + "sek")
+                LOGGER.error("tetracontrolstatus" +"TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             if self.interval >= 60:
                 LOGGER.critical("TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             return str(self.interval)
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - intervalRequest", str(ex))
@@ -165,9 +162,10 @@ class TetraControlStatus():
     def loadWhitelist(self):
         try:
 
-            self.readConfig()         
+            self.readConfig()     
+            self.loadDivera()    
             self.loadFeuerSoft()
-            self.loadDivera()
+            
 
         except Exception as ex:
             LOGGER.critical(str(ex))
@@ -181,10 +179,9 @@ class TetraControlStatus():
             file = f"/var/StatusClient/config/config.ini"
             self.config.read(file, encoding='utf-8')
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
-            time.sleep(5)
-            self.readConfig()
+
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - readConfig", str(ex))
 
@@ -197,27 +194,22 @@ class TetraControlStatus():
                     self.StatusDivera()
             
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
 
     def loadFeuerSoft(self):
         try:
-            url = (f"https://connectapi.feuersoftware.com/interfaces/public/vehicle/{self.issi}/status")
-            #token = (f"ru_6hrzrN7l6foPIfncJ2IyLvUSowX5iYl1xM1X59NgnUrOKMNd1BtQeoWB33jM5Fsgc0y3SoDI1NYtZHDbFd6tHNaiaHtbQ53RlAehBL6ITnHTQM3tTR7OD2Sldohtdx9AdG5iOfJjLl09TUVMU0zSEzfkECiuNZXSmZhOJyZATSNsarj3D-NZ4NiWTtkMy6EUi8Qjd5m5jFVlIvnffV_yIuUnSlr7NA707L-EXpEJysP6ED4PxYPZayCr-MZAuVOaTy35zMvvDKsoW3bkO-ORppLmKGshiqEU20FCqa_ZbEoQV_Xh6hBI5bRyG6Q7WoOZeITMkogVAjqeOj6pZjK6BlqH_3DnaxSm-0MEb8Ng4AiTATXe4XxVwUbUlg8sYyOCyZyxF_TEYYYED3takC3di0iGIrJ_0qY9OERFqhEXc8qNVz4pe_TpDI-T6B1mOtCQj2gEKvzFQ20mTMuGei2RRV1N-bb3Cp4CzSDtuKmQ51FLIC6VZznn4K4fD4SWREL2zx5l1ysodRWLU3_HvD2Fr-aFXDWUFidI_9j-5rhD3tEUaXyFCGzVMkoHVI5TrPwkVCA")
-            #self._FeuerSoftHeader()
-            self._FeuerSoftBody()
-    
-            #self.r = requests.post(url, data=json.dumps(self.body), headers=self.headers)
-            data = json.dumps(self.body)
-            #headers = self.headers
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusFeuersoftware.py", url, data, self.token])
-            #self._FeuerSoftStatusVode()
-            msg = (str(self.name) + " | Status: " + self.status)
-            LOGGER.debug("[" + str(os.getpid()) + "] " + "[Feuersoftware] " + self.token[0:10] + " " + msg) 
+            self.path_items = self.config.items("Feuersoftware")
+            for key, token in self.path_items:           
+                if os.path.isfile(f"/var/StatusClient/StatusAPI/fahrzeugliste/Vehicle_{key}.json"):
+                    with open(f"/var/StatusClient/StatusAPI/fahrzeugliste/Vehicle_{key}.json","r") as file:
+                        self.checkForSendFeuersoftware(token, file)
+
+
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadFeuerSoft", str(ex))
@@ -233,7 +225,7 @@ class TetraControlStatus():
                     self.token = token
                     self.StatusFeuerSoft()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - checkForSendFeuersoftware", str(ex))
@@ -241,19 +233,21 @@ class TetraControlStatus():
 
     def StatusFeuerSoft(self): #return statuscode (Http-Fehler-Code)       
         try:
-            if self.status != "5" and self.status != "9" and self.status != "10":
-                url = (f"https://connectapi.feuersoftware.com/interfaces/public/vehicle/{self.issi}/status")
-                #token = (f"ru_6hrzrN7l6foPIfncJ2IyLvUSowX5iYl1xM1X59NgnUrOKMNd1BtQeoWB33jM5Fsgc0y3SoDI1NYtZHDbFd6tHNaiaHtbQ53RlAehBL6ITnHTQM3tTR7OD2Sldohtdx9AdG5iOfJjLl09TUVMU0zSEzfkECiuNZXSmZhOJyZATSNsarj3D-NZ4NiWTtkMy6EUi8Qjd5m5jFVlIvnffV_yIuUnSlr7NA707L-EXpEJysP6ED4PxYPZayCr-MZAuVOaTy35zMvvDKsoW3bkO-ORppLmKGshiqEU20FCqa_ZbEoQV_Xh6hBI5bRyG6Q7WoOZeITMkogVAjqeOj6pZjK6BlqH_3DnaxSm-0MEb8Ng4AiTATXe4XxVwUbUlg8sYyOCyZyxF_TEYYYED3takC3di0iGIrJ_0qY9OERFqhEXc8qNVz4pe_TpDI-T6B1mOtCQj2gEKvzFQ20mTMuGei2RRV1N-bb3Cp4CzSDtuKmQ51FLIC6VZznn4K4fD4SWREL2zx5l1ysodRWLU3_HvD2Fr-aFXDWUFidI_9j-5rhD3tEUaXyFCGzVMkoHVI5TrPwkVCA")
-                self._FeuerSoftHeader()
-                self._FeuerSoftBody()
-        
-                self.r = requests.post(url, data=json.dumps(self.body), headers=self.headers)
-
-                self._FeuerSoftStatusVode()
-                msg = ("Senden: " + str(self.name) + " | Info: " + str(self.r.status_code) + " | Token: " + self.token[0:10])
-                LOGDAT.warning("Gesendet: " + self.token[0:10] + " " + msg)
-                if str(self.r.status_code) == "200":
-                    LOGGER.info(msg)
+            url = (f"https://connectapi.feuersoftware.com/interfaces/public/vehicle/{self.issi}/status")
+            #token = (f"ru_6hrzrN7l6foPIfncJ2IyLvUSowX5iYl1xM1X59NgnUrOKMNd1BtQeoWB33jM5Fsgc0y3SoDI1NYtZHDbFd6tHNaiaHtbQ53RlAehBL6ITnHTQM3tTR7OD2Sldohtdx9AdG5iOfJjLl09TUVMU0zSEzfkECiuNZXSmZhOJyZATSNsarj3D-NZ4NiWTtkMy6EUi8Qjd5m5jFVlIvnffV_yIuUnSlr7NA707L-EXpEJysP6ED4PxYPZayCr-MZAuVOaTy35zMvvDKsoW3bkO-ORppLmKGshiqEU20FCqa_ZbEoQV_Xh6hBI5bRyG6Q7WoOZeITMkogVAjqeOj6pZjK6BlqH_3DnaxSm-0MEb8Ng4AiTATXe4XxVwUbUlg8sYyOCyZyxF_TEYYYED3takC3di0iGIrJ_0qY9OERFqhEXc8qNVz4pe_TpDI-T6B1mOtCQj2gEKvzFQ20mTMuGei2RRV1N-bb3Cp4CzSDtuKmQ51FLIC6VZznn4K4fD4SWREL2zx5l1ysodRWLU3_HvD2Fr-aFXDWUFidI_9j-5rhD3tEUaXyFCGzVMkoHVI5TrPwkVCA")
+            #self._FeuerSoftHeader()
+            self._FeuerSoftBody()
+    
+            #self.r = requests.post(url, data=json.dumps(self.body), headers=self.headers)
+            data = json.dumps(self.body)
+            #headers = self.headers
+            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusFeuersoftware.py", url, data, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            out, err = p.communicate()
+            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
+            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+            #self._FeuerSoftStatusVode()
+            msg = (str(self.name) + " | Status: " + self.status)
+            LOGGER.debug("[" + str(os.getpid()) + "] " + "[Feuersoftware] " + self.token[0:10] + " " + msg) 
         except Exception as ex:
             LOGGER.critical(str(ex))
             LOGDAT.error(str(ex))
@@ -265,9 +259,9 @@ class TetraControlStatus():
             if str(self.r.status_code) == "404":
                 LOGGER.warning("Fahrzeug nicht angelegt!")
             if str(self.r.status_code) == "401":
-                LOGGER.error("Falscher Token!")
+                LOGGER.error("tetracontrolstatus" +"Falscher Token!")
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftStatusVode", str(ex))
@@ -278,7 +272,7 @@ class TetraControlStatus():
                             'status': self.status
                     }
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftBody", str(ex))
@@ -291,30 +285,28 @@ class TetraControlStatus():
                             'content-type': 'application/json',
                             }
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftHeader", str(ex))
 
     def StatusDivera(self):  #return statuscode (Http-Fehler-Code)
         try:
-            self.path_items = self.config.items("Divera")
-            for key, token in self.path_items: 
-                if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
-                    self.token = token
-                    self.StatusDivera()
+            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.token)
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusDivera.py", self.status, url, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
             
         except Exception as ex:
-            LOGGER.error("[" + str(os.getpid()) + "] " + str(ex))
+            LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
 
 
     def _DiveraStatusCode(self):
         try:
             if str(self.r.status_code) == "403":
-                LOGGER.error("Falscher Token!")
+                LOGGER.error("tetracontrolstatus" +"Falscher Token!")
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus" +str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _DiveraStatusCode", str(ex))

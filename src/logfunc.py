@@ -21,7 +21,7 @@ def init_logging():
     chromalog.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
     fh = logging.Formatter('%(asctime)s - %(message)s - %(filename)s')
     LOGGER.setLevel(logging.DEBUG)
-    file = ("logging.log")
+    file = ("/var/StatusClient/StatusAPI/logging.log")
     fh = logging.FileHandler(file, encoding = "UTF-8")
     fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
