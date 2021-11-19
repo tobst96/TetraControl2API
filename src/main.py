@@ -15,6 +15,7 @@ LOGDAT = loggingdatei()
 LOGGER = logging.getLogger('>>>main<<<')
 LOGDAT = logging.getLogger('>>>logdata<<<')
 
+sys.setrecursionlimit(1024)
 
 def pid_status():
     subprocess.Popen([sys.executable, "/var/StatusClient/pid_status.py"])

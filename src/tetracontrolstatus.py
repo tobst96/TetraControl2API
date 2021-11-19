@@ -55,7 +55,7 @@ class TetraControlStatus():
         LOGDAT.error(str(ex))
         LOGGER.critical("Keine TetraControl Verbindung.")
         LOGGER.warning("Config nicht richtig eingestellt?")
-        LOGGER.error("Starte ein neuen Versuch in 5 Sekunden")
+        LOGGER.error("tetracontrolstatus", "Starte ein neuen Versuch in 5 Sekunden")
         time.sleep(5)
         self.checkTC()
 
@@ -89,7 +89,7 @@ class TetraControlStatus():
                 self.loadWhitelist()
 
             except Exception as ex:
-                LOGGER.error("API senden: " + str(ex))
+                LOGGER.error("tetracontrolstatus", "API senden: " + str(ex))
                 
                 LOGGER.warning("Daten werden selber gesendet. Server reagiert nicht.")
                 erroradd()
@@ -99,7 +99,7 @@ class TetraControlStatus():
             
             self.jsonStatusList()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - readStatusJSON", str(ex))
@@ -124,7 +124,7 @@ class TetraControlStatus():
             file.write("\n" + str(jsondata))
             file.close()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - jsonStatusList", str(ex))
@@ -150,14 +150,14 @@ class TetraControlStatus():
                 LOGGER.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             if self.interval >= 20 and self.interval < 60:
-                LOGGER.error("TetraControl Abfrage letzten " + str(self.interval) + "sek")
+                LOGGER.error("tetracontrolstatus", "TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             if self.interval >= 60:
                 LOGGER.critical("TetraControl Abfrage letzten " + str(self.interval) + "sek")
                 LOGDAT.warning("TetraControl Abfrage letzten " + str(self.interval) + "sek")
             return str(self.interval)
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - intervalRequest", str(ex))
@@ -181,7 +181,7 @@ class TetraControlStatus():
             file = f"/var/StatusClient/config/config.ini"
             self.config.read(file, encoding='utf-8')
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             time.sleep(5)
             self.readConfig()
@@ -197,7 +197,7 @@ class TetraControlStatus():
                     self.StatusDivera()
             
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
@@ -217,7 +217,7 @@ class TetraControlStatus():
             msg = (str(self.name) + " | Status: " + self.status)
             LOGGER.debug("[" + str(os.getpid()) + "] " + "[Feuersoftware] " + self.token[0:10] + " " + msg) 
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadFeuerSoft", str(ex))
@@ -233,7 +233,7 @@ class TetraControlStatus():
                     self.token = token
                     self.StatusFeuerSoft()
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - checkForSendFeuersoftware", str(ex))
@@ -265,9 +265,9 @@ class TetraControlStatus():
             if str(self.r.status_code) == "404":
                 LOGGER.warning("Fahrzeug nicht angelegt!")
             if str(self.r.status_code) == "401":
-                LOGGER.error("Falscher Token!")
+                LOGGER.error("tetracontrolstatus", "Falscher Token!")
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftStatusVode", str(ex))
@@ -278,7 +278,7 @@ class TetraControlStatus():
                             'status': self.status
                     }
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftBody", str(ex))
@@ -291,7 +291,7 @@ class TetraControlStatus():
                             'content-type': 'application/json',
                             }
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftHeader", str(ex))
@@ -305,16 +305,16 @@ class TetraControlStatus():
                     self.StatusDivera()
             
         except Exception as ex:
-            LOGGER.error("[" + str(os.getpid()) + "] " + str(ex))
+            LOGGER.error("tetracontrolstatus", "[" + str(os.getpid()) + "] " + str(ex))
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
 
 
     def _DiveraStatusCode(self):
         try:
             if str(self.r.status_code) == "403":
-                LOGGER.error("Falscher Token!")
+                LOGGER.error("tetracontrolstatus", "Falscher Token!")
         except Exception as ex:
-            LOGGER.error(str(ex))
+            LOGGER.error("tetracontrolstatus", str(ex))
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _DiveraStatusCode", str(ex))
