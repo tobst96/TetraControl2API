@@ -7,8 +7,6 @@ import time
 import sys
 import json
 from datetime import datetime
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
 import re
 from datetime import datetime 
 import chromalog
@@ -26,7 +24,13 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fh.setFormatter(formatter)  
 LOGGER.addHandler(fh)
 
-
+fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
+fhd.setLevel(logging.DEBUG)
+LOGDAT = logging.getLogger('>>>logdata<<<')
+LOGDAT.addHandler(fhd)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(funcName)s')
+fhd.setFormatter(formatter)  
+LOGDAT.addHandler(fhd)  
 
 
 
@@ -72,10 +76,13 @@ def main(status, issi, name, token):
         #LOGGER.debug("[" + str(os.getpid()) + "][Fireboard] " + str(json_response))
         if json_response['status'] == 'error':
             LOGGER.critical("[" + str(os.getpid()) + "][Fireboard]" + str(json_response['errors']))
+            LOGDAT.critical("[" + str(os.getpid()) + "][Fireboard]" + str(json_response['errors']))
             return 1
         LOGGER.info("[" + str(os.getpid()) + "]" + "[Fireboard] gesendet " + token[0:10])
+        LOGDAT.info("[" + str(os.getpid()) + "]" + "[Fireboard] gesendet " + token[0:10])
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
+        LOGDAT.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
         
 
     

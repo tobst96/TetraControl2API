@@ -3,8 +3,6 @@ import chromalog
 import logging
 
 
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime 
 start_time = datetime.now() 
 
@@ -20,14 +18,23 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(fh)
 
 
+fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
+fhd.setLevel(logging.DEBUG)
+LOGDAT = logging.getLogger('>>>logdata<<<')
+LOGDAT.addHandler(fhd)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(funcName)s')
+fhd.setFormatter(formatter)  
+LOGDAT.addHandler(fhd)  
 
 
 def DiveraStatusCode(r):
     try:
         if str(r.status_code) == "403":
             LOGGER.error("[" + str(os.getpid()) + "] " + "Falscher Token!")
+            LOGDAT.error("[" + str(os.getpid()) + "] " + "Falscher Token!")
     except Exception as ex:
         LOGGER.error(str(ex))
+        LOGDAT.error(str(ex))
 
 status = str(sys.argv[1])
 url = str(sys.argv[2])
@@ -41,14 +48,18 @@ try:
         DiveraStatusCode(r)
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
+        LOGDAT.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
         msg = (str(name) + " | Info: " + str(r.status_code) + " | Status: " + status + ' | Dauer: {}'.format(time_elapsed))
         LOGGER.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
+        LOGDAT.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)
 
         
     except Exception as ex:
         LOGGER.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex)) 
+        LOGDAT.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex))
     
     
 
 except Exception as ex:
     LOGGER.error("[" + str(os.getpid()) + "] pid_StatusDivera" + str(ex))
+    LOGDAT.error("[" + str(os.getpid()) + "] pid_StatusDivera" + str(ex))

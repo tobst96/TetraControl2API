@@ -13,6 +13,13 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fh.setFormatter(formatter)  
 LOGGER.addHandler(fh)
 
+fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
+fhd.setLevel(logging.DEBUG)
+LOGDAT = logging.getLogger('>>>logdata<<<')
+LOGDAT.addHandler(fhd)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(funcName)s')
+fhd.setFormatter(formatter)  
+LOGDAT.addHandler(fhd)  
 
 def _FeuerSoftHeader(token):
     try:
@@ -24,16 +31,20 @@ def _FeuerSoftHeader(token):
         return headers
     except Exception as ex:
         LOGGER.error(str(ex))
+        LOGDAT.error(str(ex))
    
 
 def _FeuerSoftStatusVode(r):
     try:
         if str(r.status_code) == "404":
             LOGGER.warning("Fahrzeug nicht angelegt!")
+            LOGDAT.warning("Fahrzeug nicht angelegt!")  
         if str(r.status_code) == "401":
             LOGGER.error("Falscher Token!")
+            LOGDAT.error("Falscher Token!")
     except Exception as ex:
         LOGGER.error(str(ex))
+        LOGDAT.error(str(ex))
 
 headers = _FeuerSoftHeader(sys.argv[3])
 r = requests.post(str(sys.argv[1]), str(sys.argv[2]), headers, timeout = 60)
