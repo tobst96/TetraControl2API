@@ -1,0 +1,8 @@
+version: '3.1'
+
+services:
+  mycontainer:
+    image: python:buster
+    build: .
+    volumes:
+      - './path/on/docker/host:/var/StatusClient/config.ini'  
