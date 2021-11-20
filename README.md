@@ -8,4 +8,5 @@ Kinderleichte erweiterung für unterschiedlichste Dienste.<br>
 <h1>Aktuell unterstützt:</h1><br>
 -Divera24/7<br>
 -FeuerSoftware<br>
+-Fireboard<br>
 
