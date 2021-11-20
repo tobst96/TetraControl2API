@@ -1,3 +1,4 @@
+import datetime
 import sys, requests
 import logging
 
@@ -50,3 +51,13 @@ headers = _FeuerSoftHeader(sys.argv[3])
 r = requests.post(str(sys.argv[1]), str(sys.argv[2]), headers, timeout = 60)
 _FeuerSoftStatusVode(r)
 
+jsondata = {
+    "url" : (str(sys.argv[1])),
+    "data" : (str(sys.argv[2])),
+    "token" : (str(sys.argv[3])[0:10])
+}
+
+file = open("/var/StatusClient/StatusAPI/Feuersoftware.json", "a")
+file.write("\n" + str(jsondata))
+file.close()
+            

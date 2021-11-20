@@ -17,7 +17,6 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fh.setFormatter(formatter)  
 LOGGER.addHandler(fh)
 
-
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)
 LOGDAT = logging.getLogger('>>>logdata<<<')
@@ -44,7 +43,7 @@ tokendb = token
 try:
 
     try:
-        r = requests.post(url, timeout = 60)
+        r = requests.post(url, timeout = 60) 
         DiveraStatusCode(r)
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
@@ -53,11 +52,22 @@ try:
         LOGGER.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
         LOGDAT.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)
 
+        jsondata = {
+            "url" : url,
+            "name" : name,
+            "status" : status,
+            "token" : token[0:10]
+        }
+
+        file = open("/var/StatusClient/StatusAPI/Divera.json", "a")
+        file.write("\n" + str(jsondata))
+        file.close()
+            
+
         
     except Exception as ex:
         LOGGER.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex)) 
         LOGDAT.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex))
-    
     
 
 except Exception as ex:

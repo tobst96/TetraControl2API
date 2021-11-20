@@ -24,11 +24,11 @@ def pid_status():
 
 def pid_heathchecks():
     LOGGER.debug("pid_heatchecks start")
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def pid_checkFeuerSoftCehicle():
     LOGGER.debug("pid_checkFeuerSoftCehicle start")
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def startclient():
     
@@ -60,6 +60,6 @@ def startclient():
 
 if __name__ == "__main__":
     createConfigFile()
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_startup.py"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_startup.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     startclient()
     
