@@ -162,7 +162,8 @@ class TetraControlStatus():
     def loadWhitelist(self):
         try:
 
-            self.readConfig()     
+            self.readConfig()  
+            self.loadFireboard()
             self.loadDivera()    
             self.loadFeuerSoft()
             
@@ -184,6 +185,12 @@ class TetraControlStatus():
 
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - readConfig", str(ex))
+
+    def loadFireboard(self):
+        try:
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusfireboard.py", self.status, self.issi, self.name, self.token])   
+        except Exception as ex:
+            LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
 
     def loadDivera(self):
         try:
