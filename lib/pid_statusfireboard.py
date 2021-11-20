@@ -83,9 +83,19 @@ def main(status, issi, name, token):
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
         LOGDAT.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
-        
+
+        jsondata = {
+            "issi" : issi,
+            "name" : name,
+            "status" : status,
+            "token" : token[0:10]
+        }
+
+        file = open("/var/StatusClient/StatusAPI/Fireboard.json", "a")
+        file.write("\n" + str(jsondata))
+        file.close()
+            
 
     
-
 main(status=str(sys.argv[1]) ,issi = str(sys.argv[2]), name = str(sys.argv[3]), token = str(sys.argv[4]))
 

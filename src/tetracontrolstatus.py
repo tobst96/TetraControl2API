@@ -188,23 +188,26 @@ class TetraControlStatus():
 
     def loadFireboard(self):
         try:
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusfireboard.py", self.status, self.issi, self.name, self.token])   
+            LOGGER.debug("Send to Fireboard")
+            LOGDAT.debug("Send to Fireboard")
+            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startfireboard.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) 
+            out, err = p.communicate()
+            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
+            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+             
         except Exception as ex:
             LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
 
     def loadDivera(self):
         try:
-            self.path_items = self.config.items("Divera")
-            for key, token in self.path_items: 
-                if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
-                    self.token = token
-                    self.StatusDivera()
-            
+            LOGGER.debug("Send to Divera")
+            LOGDAT.debug("Send to Divera")
+            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startDivera.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)   
+            out, err = p.communicate()
+            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
+            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
         except Exception as ex:
-            LOGGER.error("tetracontrolstatus" +str(ex))
-            LOGDAT.error(str(ex))
-            
-            NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
+            LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
 
     def loadFeuerSoft(self):
         try:
@@ -237,7 +240,6 @@ class TetraControlStatus():
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - checkForSendFeuersoftware", str(ex))
                             
-
     def StatusFeuerSoft(self): #return statuscode (Http-Fehler-Code)       
         try:
             url = (f"https://connectapi.feuersoftware.com/interfaces/public/vehicle/{self.issi}/status")
@@ -296,27 +298,6 @@ class TetraControlStatus():
             LOGDAT.error(str(ex))
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _FeuerSoftHeader", str(ex))
-
-    def StatusDivera(self):  #return statuscode (Http-Fehler-Code)
-        try:
-            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.token)
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusDivera.py", self.status, url, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-            
-        except Exception as ex:
-            LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
-            NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - loadDivera", str(ex))
-
-
-    def _DiveraStatusCode(self):
-        try:
-            if str(self.r.status_code) == "403":
-                LOGGER.error("tetracontrolstatus" +"Falscher Token!")
-        except Exception as ex:
-            LOGGER.error("tetracontrolstatus" +str(ex))
-            LOGDAT.error(str(ex))
-            
-            NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - _DiveraStatusCode", str(ex))
 
     def statusman(self): #Passt den Status auf etwas plausiblen an
         if self.status == "0000":

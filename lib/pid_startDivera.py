@@ -1,4 +1,5 @@
-import logging, chromalog, sys, subprocess, configparser
+import datetime
+import logging, chromalog, sys, subprocess, os, configparser
 
 LOGGER = logging.getLogger('>>>main<<<')
 chromalog.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)s - %(message)s')
@@ -19,14 +20,13 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fhd.setFormatter(formatter)  
 LOGDAT.addHandler(fhd)  
 
-class sendStatusToFireboard:
-
-    def __init__(self, issi, status, name):   
-        self.issi = issi
+class StartDivera():
+    def __init__(self, status, issi, name):
         self.status = status
+        self.issi = issi
         self.name = name
         self.readConfig()
-        self.searchToken()
+        self.loadDivera()
 
     def readConfig(self):
         try:
@@ -38,25 +38,28 @@ class sendStatusToFireboard:
             LOGDAT.error(str(ex))
 
 
-    def searchToken(self):
-            try:
-                self.path_items = self.config.items("Fireboard")
-                for key, token in self.path_items: 
-                    if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
-                        self.token = token
-                        self.loadFireboard()
-            except Exception as ex:
-                LOGGER.error(str(ex))
-                LOGDAT.error(str(ex))
-
-    def loadFireboard(self):
+    def loadDivera(self):
         try:
-            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusfireboard.py", self.status, self.issi, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            self.path_items = self.config.items("Divera")
+            for key, token in self.path_items: 
+                if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
+                    self.token = token
+                    LOGGER.debug("Divera-Token: " + self.token)
+                    self.StatusDivera()          
+        except Exception as ex:
+            LOGGER.error("startDivera" +str(ex))
+            LOGDAT.error(str(ex))
+           
+    def StatusDivera(self):  #return statuscode (Http-Fehler-Code)
+        try:
+            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.token)
+            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusDivera.py", self.status, url, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             out, err = p.communicate()
             LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
             LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
-        except Exception as ex:
-            LOGGER.error(str(ex))
-            LOGDAT.error(str(ex))
 
-sendStatusToFireboard(sys.argv[1], sys.argv[2], sys.argv[3])
+            
+        except Exception as ex:
+            LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
+            
+StartDivera(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])
