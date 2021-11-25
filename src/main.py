@@ -17,11 +17,7 @@ LOGDAT = logging.getLogger('>>>logdata<<<')
 
 
 def pid_status():
-    p = subprocess.Popen([sys.executable, "/var/StatusClient/pid_status.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out, err = p.communicate()
-    #LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-    #LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
-
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_status.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 def pid_heathchecks():
     LOGGER.debug("pid_heatchecks start")
     subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

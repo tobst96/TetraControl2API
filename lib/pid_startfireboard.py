@@ -51,12 +51,9 @@ class sendStatusToFireboard:
 
     def loadFireboard(self):
         try:
-            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusfireboard.py", self.status, self.issi, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            out, err = p.communicate()
-            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusfireboard.py", self.status, self.issi, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         except Exception as ex:
             LOGGER.error(str(ex))
             LOGDAT.error(str(ex))
 
-sendStatusToFireboard(sys.argv[1], sys.argv[2], sys.argv[3])
+sendStatusToFireboard(status = sys.argv[1], issi = sys.argv[2], name = sys.argv[3])

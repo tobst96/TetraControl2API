@@ -1,5 +1,5 @@
 import datetime
-import logging, chromalog, sys, subprocess, os, configparser
+import logging, chromalog, sys, subprocess, os, configparser, re
 
 LOGGER = logging.getLogger('>>>main<<<')
 chromalog.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)s - %(message)s')
@@ -20,13 +20,14 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fhd.setFormatter(formatter)  
 LOGDAT.addHandler(fhd)  
 
-class StartDivera():
+
+class sendtoapi():
     def __init__(self, status, issi, name):
         self.status = status
         self.issi = issi
         self.name = name
         self.readConfig()
-        self.loadDivera()
+        self.loadAPI()
 
     def readConfig(self):
         try:
@@ -34,28 +35,33 @@ class StartDivera():
             file = f"/var/StatusClient/config/config.ini"
             self.config.read(file, encoding='utf-8')
         except Exception as ex:
-            LOGGER.error("tetracontrolstatus" +str(ex))
+            LOGGER.error("SendToAPI" +str(ex))
             LOGDAT.error(str(ex))
 
-
-    def loadDivera(self):
+    def loadAPI(self):
         try:
-            self.path_items = self.config.items("Divera")
-            for key, token in self.path_items: 
-                if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
-                    self.token = token
-                    LOGGER.debug("Divera-Token: " + self.token)
-                    self.StatusDivera()          
+            self.path_items = self.config.items("SendToAPI")
+            for key, url in self.path_items: 
+                if url != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
+                    self.url = url
+                    try:
+                        self.url = self.url.replace("%ISSI%", self.issi)
+                    except:
+                        pass
+                    try:
+                        self.url = self.url.replace("%STATUS%", self.status)
+                    except:
+                        pass
+                    try:
+                        self.url = self.url.replace("%NAME%", self.name)
+                    except:
+                        pass
+
+                    
+
         except Exception as ex:
             LOGGER.error("startDivera" +str(ex))
             LOGDAT.error(str(ex))
-           
-    def StatusDivera(self):  #return statuscode (Http-Fehler-Code)
-        try:
-            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.token)
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusDivera.py", self.status, url, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        
-        except Exception as ex:
-            LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
-            
-StartDivera(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])
+
+
+sendtoapi(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])
