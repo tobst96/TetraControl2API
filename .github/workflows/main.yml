@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up QEMU
+        uses: tobiasobst/tetracontroltoapi@lasted
+      -
+        name: Set up Docker Buildx
+        uses: tobiasobst/tetracontroltoapi@lasted
+      -
+        name: Login to DockerHub
+        uses: tobiasobst/tetracontroltoapi@lasted
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: tobiasobst/tetracontroltoapi@lasted
+        with:
+          push: true
+          tags: user/app:latest
