@@ -15,7 +15,7 @@ class TetraControlStatus():
     def __init__(self, user, password, url, notifymydevice) -> None:
         self.user = user
         self.password = password
-        self.interval = "2"
+        self.interval = "5"
         self.ralt = ""
         self.summe = 0
         self.urlhost = url
