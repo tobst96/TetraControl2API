@@ -21,7 +21,7 @@ jobs:
         name: Login to DockerHub
         uses: tobiasobst/tetracontroltoapi@lasted
         with:
-          username: ${{ DockerUsername }}
+          username: ${{ DOCKERUSERNAME }}
           password: ${{ DOCKERTOKEN }}
       -
         name: Build and push
