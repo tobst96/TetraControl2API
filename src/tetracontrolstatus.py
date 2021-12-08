@@ -15,7 +15,7 @@ class TetraControlStatus():
     def __init__(self, user, password, url, notifymydevice) -> None:
         self.user = user
         self.password = password
-        self.interval = "2"
+        self.interval = "5"
         self.ralt = ""
         self.summe = 0
         self.urlhost = url
@@ -190,10 +190,8 @@ class TetraControlStatus():
         try:
             LOGGER.debug("Send to Fireboard")
             LOGDAT.debug("Send to Fireboard")
-            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startfireboard.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) 
-            out, err = p.communicate()
-            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startfireboard.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) 
+
              
         except Exception as ex:
             LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
@@ -202,10 +200,7 @@ class TetraControlStatus():
         try:
             LOGGER.debug("Send to Divera")
             LOGDAT.debug("Send to Divera")
-            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startDivera.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)   
-            out, err = p.communicate()
-            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_startDivera.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)   
         except Exception as ex:
             LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
 
@@ -250,10 +245,7 @@ class TetraControlStatus():
             #self.r = requests.post(url, data=json.dumps(self.body), headers=self.headers)
             data = json.dumps(self.body)
             #headers = self.headers
-            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusFeuersoftware.py", url, data, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            out, err = p.communicate()
-            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusFeuersoftware.py", url, data, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             #self._FeuerSoftStatusVode()
             msg = (str(self.name) + " | Status: " + self.status)
             LOGGER.debug("[" + str(os.getpid()) + "] " + "[Feuersoftware] " + self.token[0:10] + " " + msg) 
