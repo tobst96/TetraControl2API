@@ -32,16 +32,6 @@ jobs:
           TAG_NAME: "lasted"
           BUILDX: "true"
 
-      - name: Build & Push to Quay.io
-        uses: opspresso/action-docker@master
-        with:
-          args: --docker
-        env:
-          USERNAME: ${{ secrets.QUAY_USERNAME }}
-          PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-          REGISTRY: "quay.io"
-          TAG_NAME: "lasted"
-          BUILDX: "true"
 
       - name: Build & Push to GitHub Package
         uses: opspresso/action-docker@master
