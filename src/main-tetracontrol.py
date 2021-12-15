@@ -15,23 +15,18 @@ LOGDAT = loggingdatei()
 LOGGER = logging.getLogger('>>>main<<<')
 LOGDAT = logging.getLogger('>>>logdata<<<')
 
+sys.setrecursionlimit(1024)
 
 def pid_status():
-    p = subprocess.Popen([sys.executable, "/var/StatusClient/pid_status.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out, err = p.communicate()
-    #LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
-    #LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_status.py"])
 
 def pid_heathchecks():
-    LOGGER.debug("pid_heatchecks start")
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"])
 
 def pid_checkFeuerSoftCehicle():
-    LOGGER.debug("pid_checkFeuerSoftCehicle start")
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"])
 
 def startclient():
-    
     config = configparser.ConfigParser(interpolation=None)
     file = f"/var/StatusClient/config/config.ini"
     config.read(file, encoding='utf-8')
@@ -60,6 +55,6 @@ def startclient():
 
 if __name__ == "__main__":
     createConfigFile()
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_startup.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen([sys.executable, "/var/StatusClient/pid_startup.py"])
     startclient()
     
