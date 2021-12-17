@@ -1,0 +1,22 @@
+[TetraControl]
+user = Benutzer
+password = Passwoet
+url = meineurl.net:8080
+
+[Monitoring]
+healthchecks = Gibt es hier https://https://healthchecks.io
+
+[Feuersoftware]
+token1 = hsdgjoifc
+token2 = token nummer immer höhrer zählen
+
+[Divera]
+token1 = hsdgjoifc
+token2 = token nummer immer höhrer zählen
+
+[Fireboard]
+token1 = hsdgjoifc
+token2 = token nummer immer höhrer zählen
+
+[SendToAPI]
+token1 = https://meineurl.de/api/v1/status/{"issi",%ISSI%;"name",%NAME%;"status",%STATUS%}
