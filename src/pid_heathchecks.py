@@ -20,14 +20,18 @@ try:
     config = configparser.ConfigParser(interpolation=None)
     file = f"/var/StatusClient/config/config.ini"
     config.read(file, encoding='utf-8')
-    uuidhc = config.get("Monitoring","healthchecks")
+    uuidhc = config.get("Monitoring","URL")
     if uuidhc == "" or uuidhc == None:
         LOGGER.debug("Kein Monitoring eingerichtet. https://healthchecks.io")
     else:
         LOGGER.debug("Monitoring ..")
-        url = "https://hc-ping.com/" + uuidhc
-        requests.get(url, timeout=10)
-        LOGGER.info("Monitoring OK")
+        url = uuidhc
+        response = requests.get(url)
+        if response.status_code == 200:
+            LOGGER.debug("Monitoring erfolgreich")
+        else:
+            LOGGER.debug("Monitoring fehlgeschlagen")
+
 
 except requests.RequestException as e:
     # Log ping failure here...

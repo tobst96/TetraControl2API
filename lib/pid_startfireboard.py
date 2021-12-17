@@ -1,5 +1,7 @@
 import logging, chromalog, sys, subprocess, configparser
 
+from pygelf import GelfUdpHandler
+
 LOGGER = logging.getLogger('>>>main<<<')
 chromalog.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)s - %(message)s')
 fh = logging.Formatter('[%(levelname)s] %(asctime)s - %(message)s - %(filename)s')
@@ -10,6 +12,7 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
 fh.setFormatter(formatter)  
 LOGGER.addHandler(fh)
+LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
 
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)

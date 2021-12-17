@@ -15,7 +15,6 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(fh)
 LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
 
-
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)
 LOGDAT = logging.getLogger('>>>logdata<<<')
@@ -24,13 +23,13 @@ formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)
 fhd.setFormatter(formatter)  
 LOGDAT.addHandler(fhd)  
 
-class StartDivera():
+class StartStatusToAPI():
     def __init__(self, status, issi, name):
         self.status = status
         self.issi = issi
         self.name = name
         self.readConfig()
-        self.loadDivera()
+        self.loadStatusToAPI()
 
     def readConfig(self):
         try:
@@ -42,24 +41,41 @@ class StartDivera():
             LOGDAT.error(str(ex))
 
 
-    def loadDivera(self):
+    def loadStatusToAPI(self):
         try:
-            self.path_items = self.config.items("Divera")
+            self.path_items = self.config.items("SendToAPI")
             for key, token in self.path_items: 
-                if token != "Kann belibig erweitert werden. Token Nummer nur erhöhen":
-                    self.token = token
-                    LOGGER.debug("Divera-Token: " + self.token)
-                    self.StatusDivera()          
+                self.url = token
+                LOGGER.debug("StatusToAPI-Token: " + self.url)
+                self.StatusStatusToAPI()          
         except Exception as ex:
-            LOGGER.error("startDivera" +str(ex))
+            LOGGER.error("startStatusToAPI" +str(ex))
             LOGDAT.error(str(ex))
            
-    def StatusDivera(self):  #return statuscode (Http-Fehler-Code)
+    def sendStatustoAPI(self):
         try:
-            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.token)
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusDivera.py", self.status, url, self.name, self.token], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            self.url = self.url.replace("%ISSI%", self.issi)
+        except:
+            pass
+        try:
+            self.url = self.url.replace("%STATUS%", self.status)
+        except:
+            pass
+        try:
+            self.url = self.url.replace("%NAME%", self.name)
+        except:
+            pass
+
+        subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusSENDTOAPI.py", self.url], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        
+
+    def StatusStatusToAPI(self):  #return statuscode (Http-Fehler-Code)
+        try:
+            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.url)
+            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusStatusToAPI.py", self.status, url, self.name, self.url], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         
         except Exception as ex:
             LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
             
-StartDivera(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])
+StartStatusToAPI(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])

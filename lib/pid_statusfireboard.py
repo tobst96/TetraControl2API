@@ -11,6 +11,8 @@ import re
 from datetime import datetime 
 import chromalog
 import logging, os
+
+from pygelf import GelfUdpHandler
 start_time = datetime.now() 
 
 LOGGER = logging.getLogger('>>>main<<<')
@@ -21,8 +23,9 @@ file = ("/var/StatusClient/StatusAPI/logging.log")
 fh = logging.FileHandler(file, encoding = "UTF-8")
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
-fh.setFormatter(formatter)  
+fh.setFormatter(formatter) 
 LOGGER.addHandler(fh)
+LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
 
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)

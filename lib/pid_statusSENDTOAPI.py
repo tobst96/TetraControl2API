@@ -15,7 +15,7 @@ file = ("/var/StatusClient/StatusAPI/logging.log")
 fh = logging.FileHandler(file, encoding = "UTF-8")
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
-fh.setFormatter(formatter)  
+fh.setFormatter(formatter) 
 LOGGER.addHandler(fh)
 LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
 
@@ -28,7 +28,7 @@ fhd.setFormatter(formatter)
 LOGDAT.addHandler(fhd)  
 
 
-def DiveraStatusCode(r):
+def StatusToAPIStatusCode(r):
     try:
         if str(r.status_code) == "403":
             LOGGER.error("[" + str(os.getpid()) + "] " + "Falscher Token!")
@@ -37,41 +37,36 @@ def DiveraStatusCode(r):
         LOGGER.error(str(ex))
         LOGDAT.error(str(ex))
 
-status = str(sys.argv[1])
-url = str(sys.argv[2])
-name = str(sys.argv[3])
-token = str(sys.argv[4])
-tokendb = token
+
+url = str(sys.argv[1])
+
+
 try:
 
     try:
         r = requests.post(url, timeout = 60) 
-        DiveraStatusCode(r)
+        StatusToAPIStatusCode(r)
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
         LOGDAT.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
-        msg = (str(name) + " | Info: " + str(r.status_code) + " | Status: " + status + ' | Dauer: {}'.format(time_elapsed))
-        LOGGER.info("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
-        LOGDAT.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)
+        LOGGER.debug("[" + str(os.getpid()) + "] " + "[StatusToAPI] " + url[0:100] + "...")  
+        LOGDAT.debug("[" + str(os.getpid()) + "] " + "[StatusToAPI] " + url[0:100] + "...") 
 
         jsondata = {
-            "url" : url,
-            "name" : name,
-            "status" : status,
-            "token" : token[0:10]
+            "url" : url
         }
 
-        file = open("/var/StatusClient/StatusAPI/Divera.json", "a")
+        file = open("/var/StatusClient/StatusAPI/StatusToAPI.json", "a")
         file.write("\n" + str(jsondata))
         file.close()
             
 
         
     except Exception as ex:
-        LOGGER.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex)) 
-        LOGDAT.critical("[" + str(os.getpid()) + "] pid_StatusDivera" + "send divera " + str(ex))
+        LOGGER.critical("[" + str(os.getpid()) + "] pid_statusSENDTOAPI" + "send divera " + str(ex)) 
+        LOGDAT.critical("[" + str(os.getpid()) + "] pid_statusSENDTOAPI" + "send divera " + str(ex))
     
 
 except Exception as ex:
-    LOGGER.error("[" + str(os.getpid()) + "] pid_StatusDivera" + str(ex))
-    LOGDAT.error("[" + str(os.getpid()) + "] pid_StatusDivera" + str(ex))
+    LOGGER.error("[" + str(os.getpid()) + "] pid_statusSENDTOAPI" + str(ex))
+    LOGDAT.error("[" + str(os.getpid()) + "] pid_statusSENDTOAPI" + str(ex))

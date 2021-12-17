@@ -14,13 +14,16 @@ def createConfigFile(configfile_name=f"/var/StatusClient/config/config.ini"):
         Config.set("TetraControl", "URL", "192.168.2.100.xxx:8080 oder https://status.internet.de")
 
         Config.add_section("Monitoring")
-        Config.set("Monitoring", "healthchecks", "")
+        Config.set("Monitoring", "URL", "")
 
         Config.add_section("Feuersoftware")
 
         Config.add_section("Divera")
 
         Config.add_section("Fireboard")
+
+        Config.add_section("SendToAPI")
+        Config.set("SendToAPI", "Kann belibig erweitert werden. Token Nummer nur erhöhen", "https://status.internet.de/api/v1/status/%ISSI%/%STATUS%/%NAME%")
 
         Config.write(cfgfile)
         cfgfile.close()

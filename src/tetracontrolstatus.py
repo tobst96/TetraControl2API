@@ -59,11 +59,12 @@ class TetraControlStatus():
 
     def start(self):
         try:            
-            url = self.url + self.intervalRequest()
+            url = self.url + "2"
             self.requestTC(url)
             if self.ralt != self.r.text:
                 self.ralt = self.r.text
                 self.rstatus = json.loads(self.r.text)
+                LOGGER.debug("TetraControl Status: " + str(self.rstatus))
                 for dsatz in self.rstatus["issis"]:
                     self.readStatusJSON(dsatz)
                         
@@ -166,6 +167,7 @@ class TetraControlStatus():
             self.loadFireboard()
             self.loadDivera()    
             self.loadFeuerSoft()
+            self.loadStatusToAPI()
             
 
         except Exception as ex:
@@ -185,6 +187,18 @@ class TetraControlStatus():
 
             
             NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - readConfig", str(ex))
+
+    def loadStatusToAPI(self):
+        try:
+            LOGGER.debug("Send to StatusToAPI")
+            LOGDAT.debug("Send to StatusToAPI")
+            p = subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statustoapi.py", self.status, self.issi, self.name], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)   
+            out, err = p.communicate()
+            LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
+            LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
+        except Exception as ex:
+            LOGGER.error("tetracontrolstatus - StatusToAPI: " +str(ex))
+
 
     def loadFireboard(self):
         try:
@@ -207,7 +221,7 @@ class TetraControlStatus():
             LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
             LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
         except Exception as ex:
-            LOGGER.error("tetracontrolstatus - fireboard: " +str(ex))
+            LOGGER.error("tetracontrolstatus - Divera: " +str(ex))
 
     def loadFeuerSoft(self):
         try:
@@ -325,4 +339,4 @@ class TetraControlStatus():
         if self.status == "8A5B":
             self.status = ("9")
         if self.status == "8A5B":
-            self.status = ("EDV abfrage")
+            self.status = ("9")

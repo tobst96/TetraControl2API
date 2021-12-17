@@ -1,4 +1,5 @@
 import logging, os
+from pygelf import GelfUdpHandler
 
 def init_loggingalt():    
     LOG_LEVEL = logging.DEBUG
@@ -27,6 +28,7 @@ def init_logging():
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
     fh.setFormatter(formatter)  
     LOGGER.addHandler(fh)
+    LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
     return LOGGER
 
 def loggingdatei():

@@ -17,6 +17,9 @@ if not os.path.isfile("/var/StatusClient/StatusAPI/Feuersoftware.json"):
 if not os.path.isfile("/var/StatusClient/StatusAPI/Fireboard.json"):
     file = open("/var/StatusClient/StatusAPI/Fireboard.json", "w")
     file.close()
+if not os.path.isfile("/var/StatusClient/StatusAPI/StatusToAPI.json"):
+    file = open("/var/StatusClient/StatusAPI/StatusToAPI.json", "w")
+    file.close()
 
 subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
