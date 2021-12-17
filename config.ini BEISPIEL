@@ -4,7 +4,7 @@ password = Passwoet
 url = meineurl.net:8080
 
 [Monitoring]
-healthchecks = Gibt es hier https://https://healthchecks.io
+URL = Gibt es hier z.B. https://healthchecks.io
 
 [Feuersoftware]
 token1 = hsdgjoifc
