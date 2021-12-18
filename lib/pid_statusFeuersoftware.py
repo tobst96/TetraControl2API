@@ -41,8 +41,8 @@ def _FeuerSoftStatusVode(r):
             LOGGER.warning("Fahrzeug nicht angelegt!")
             LOGDAT.warning("Fahrzeug nicht angelegt!")  
         if str(r.status_code) == "401":
-            LOGGER.error("Falscher Token!")
-            LOGDAT.error("Falscher Token!")
+            LOGGER.error("Falscher Token! " + sys.argv[3])
+            LOGDAT.error("Falscher Token! " + sys.argv[3])
     except Exception as ex:
         LOGGER.error(str(ex))
         LOGDAT.error(str(ex))
