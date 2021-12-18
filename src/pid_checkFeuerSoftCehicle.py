@@ -10,11 +10,27 @@ from tetracontrolstatus import TetraControlStatus
 import logging, socket
 from FeuerSoftVehicle import FeuerSoftVehicle
 import schedule, time, configparser, ctypes
-from logfunc import init_logging, loggingdatei
-LOGGER = init_logging()
-LOGDAT = loggingdatei()
+from pygelf import GelfUdpHandler
+import logging, chromalog, subprocess
 LOGGER = logging.getLogger('>>>main<<<')
+chromalog.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)s - %(message)s')
+fh = logging.Formatter('[%(levelname)s] %(asctime)s - %(message)s - %(filename)s')
+LOGGER.setLevel(logging.DEBUG)
+file = ("/var/StatusClient/StatusAPI/logging.log")
+fh = logging.FileHandler(file, encoding = "UTF-8")
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
+fh.setFormatter(formatter)  
+LOGGER.addHandler(fh)
+LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
+
+fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
+fhd.setLevel(logging.DEBUG)
 LOGDAT = logging.getLogger('>>>logdata<<<')
+LOGDAT.addHandler(fhd)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(funcName)s')
+fhd.setFormatter(formatter)  
+LOGDAT.addHandler(fhd)  
 
 
 config = configparser.ConfigParser(interpolation=None)
@@ -35,4 +51,4 @@ for key, token in path_items:
 
 ende = time.time()
 timede = ('{:5.3f}'.format(ende-start))
-LOGGER.info("Whitelist geschrieben in " + str(timede) + "sek")
+LOGGER.info("Whitelist Feuersoftware Fahrzeuge geschrieben in " + str(timede) + "sek")

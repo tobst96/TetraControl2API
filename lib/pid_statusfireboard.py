@@ -25,7 +25,7 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
 fh.setFormatter(formatter) 
 LOGGER.addHandler(fh)
-LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
+LOGGER.addHandler(GelfUdpHandler(host='seq.tobiobst.de', port=12201, debug=True))
 
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)
@@ -78,14 +78,14 @@ def main(status, issi, name, token):
         json_response = json.loads(response.read().decode("utf-8"))
         #LOGGER.debug("[" + str(os.getpid()) + "][Fireboard] " + str(json_response))
         if json_response['status'] == 'error':
-            LOGGER.critical("[" + str(os.getpid()) + "][Fireboard]" + str(json_response['errors']))
-            LOGDAT.critical("[" + str(os.getpid()) + "][Fireboard]" + str(json_response['errors']))
+            LOGGER.critical("[" + str(os.getpid()) + "] [Fireboard]" + str(json_response['errors']))
+            LOGDAT.critical("[" + str(os.getpid()) + "] [Fireboard]" + str(json_response['errors']))
             return 1
-        LOGGER.info("[" + str(os.getpid()) + "]" + "[Fireboard] gesendet " + token[0:10])
-        LOGDAT.info("[" + str(os.getpid()) + "]" + "[Fireboard] gesendet " + token[0:10])
+        LOGGER.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + token[0:10])
+        LOGDAT.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + token[0:10])
         time_elapsed = datetime.now() - start_time 
-        LOGGER.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
-        LOGDAT.debug("[" + str(os.getpid()) + "]" + '[Dauer] Fireboard senden: {}'.format(time_elapsed))
+        LOGGER.debug("[" + str(os.getpid()) + "]" + ' [Dauer] Fireboard senden: {}'.format(time_elapsed))
+        LOGDAT.debug("[" + str(os.getpid()) + "]" + ' [Dauer] Fireboard senden: {}'.format(time_elapsed))
 
         jsondata = {
             "issi" : issi,

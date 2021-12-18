@@ -22,8 +22,11 @@ def pid_status():
     #LOGGER.debug('SUBPROCESS ERROR: ' + str(err))
     #LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
 
+def pid_statuslong():
+    p = subprocess.Popen([sys.executable, "/var/StatusClient/pid_statuslong.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, err = p.communicate()
+
 def pid_heathchecks():
-    LOGGER.debug("pid_heatchecks start")
     subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def pid_checkFeuerSoftCehicle():
@@ -42,6 +45,7 @@ def startclient():
     TetraControlStatus.checkTC(prog)
     
     schedule.every(1).seconds.do(pid_status)
+    schedule.every(6).hours.do(pid_statuslong)
     schedule.every(5).minutes.do(TetraControlStatus.checkTC, prog)
     schedule.every(1).minutes.do(pid_heathchecks)
     schedule.every(1).hours.do(pid_checkFeuerSoftCehicle)

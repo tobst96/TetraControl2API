@@ -17,7 +17,7 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
 fh.setFormatter(formatter)  
 LOGGER.addHandler(fh)
-LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
+LOGGER.addHandler(GelfUdpHandler(host='seq.tobiobst.de', port=12201, debug=True))
 
 fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
 fhd.setLevel(logging.DEBUG)
@@ -51,7 +51,7 @@ try:
         LOGGER.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
         LOGDAT.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
         msg = (str(name) + " | Info: " + str(r.status_code) + " | Status: " + status + ' | Dauer: {}'.format(time_elapsed))
-        LOGGER.info("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
+        LOGGER.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
         LOGDAT.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)
 
         jsondata = {

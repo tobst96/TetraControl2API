@@ -28,7 +28,7 @@ def init_logging():
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
     fh.setFormatter(formatter)  
     LOGGER.addHandler(fh)
-    LOGGER.addHandler(GelfUdpHandler(host='https://seq.tobiobst.de', port=12201))
+    LOGGER.addHandler(GelfUdpHandler(host='seq.tobiobst.de', port=12201, debug=True))
     return LOGGER
 
 def loggingdatei():

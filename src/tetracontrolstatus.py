@@ -2,14 +2,33 @@ from error import erroradd
 from datetime import datetime 
 from safe import tosafe
 from notifymydevice import NotifyMyDevice
-import requests, configparser, time, re, json, ctypes, logging, os, ast, urllib3, socket, subprocess, sys
+import requests, configparser, time, re, json, os, ast, socket, subprocess, random
 from datetime import datetime
 from requests import put, get
-from logfunc import init_logging, loggingdatei
-LOGGER = init_logging()
-LOGDAT = loggingdatei()
+import logging, chromalog, sys, subprocess, os, configparser
+
+from pygelf import GelfUdpHandler
+
 LOGGER = logging.getLogger('>>>main<<<')
+chromalog.basicConfig(level=logging.INFO, format='[%(levelname)s] %(asctime)s - %(message)s')
+fh = logging.Formatter('[%(levelname)s] %(asctime)s - %(message)s - %(filename)s')
+LOGGER.setLevel(logging.DEBUG)
+file = ("/var/StatusClient/StatusAPI/logging.log")
+fh = logging.FileHandler(file, encoding = "UTF-8")
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(filename)s - %(funcName)s')
+fh.setFormatter(formatter)  
+LOGGER.addHandler(fh)
+LOGGER.addHandler(GelfUdpHandler(host='seq.tobiobst.de', port=12201, debug=True))
+
+
+fhd = logging.FileHandler("/var/StatusClient/StatusAPI/logging.log", encoding = "UTF-8")
+fhd.setLevel(logging.DEBUG)
 LOGDAT = logging.getLogger('>>>logdata<<<')
+LOGDAT.addHandler(fhd)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s - %(funcName)s')
+fhd.setFormatter(formatter)  
+LOGDAT.addHandler(fhd)  
 
 class TetraControlStatus():
     def __init__(self, user, password, url, notifymydevice) -> None:
@@ -20,6 +39,7 @@ class TetraControlStatus():
         self.summe = 0
         self.urlhost = url
         self.start = time.time()
+        self.http = url
         self.url = f"http://{self.user}:{self.password }@{url}/API/statusgps.json?maxalterstatus="
         self.mydevice = NotifyMyDevice(notifymydevice)
         send = "Gestartet. Auf dem PC ", socket.gethostname()
@@ -42,7 +62,7 @@ class TetraControlStatus():
             
             if self.r.status_code != 200:
                 self.checkTcError(str(self.r.status_code))
-                LOGDAT.info("TC StatusCode Check: " + str(self.r.status_code))
+                LOGGER.debug("TC StatusCode Check: " + str(self.r.status_code))
             #LOGDAT.debug("TetraControl Check, status: " + str())
         except Exception as ex:
             self.checkTcError(ex)
@@ -64,13 +84,46 @@ class TetraControlStatus():
             if self.ralt != self.r.text:
                 self.ralt = self.r.text
                 self.rstatus = json.loads(self.r.text)
-                LOGGER.debug("TetraControl Status: " + str(self.rstatus))
                 for dsatz in self.rstatus["issis"]:
+                    self.msgtext = "Normal"
                     self.readStatusJSON(dsatz)
                         
         except Exception as ex:
            LOGGER.critical(str(ex))
            self.checkTC()
+           LOGDAT.error(str(ex))
+           
+           NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - start", str(ex))
+
+    def startlong(self):
+        try:            
+            LOGGER.info("Rufe Funkstatus der letzten 6 Stunden ab!")
+            url = self.url + "21600"
+            self.requestTC(url)
+            if self.ralt != self.r.text:
+                self.ralt = self.r.text
+                self.rstatus = json.loads(self.r.text)
+                if self.rstatus != "{'issis': []}":
+                    LOGGER.debug("TetraControl Status: " + str(self.rstatus))
+                    
+                for dsatz in self.rstatus["issis"]:
+                    try:
+                        checktc = requests.get(f"http://{self.user}:{self.password}@{self.http}/API/issi.json?filter=" + str(dsatz["ISSI"]))
+                        tempstatus = json.loads(checktc.text)
+
+                        if str(tempstatus["issis"][0]["status"]) == dsatz["status"]:
+                            LOGGER.debug("Status ist gleich, senden!")
+                            self.msgtext = "Rückwirkend"
+                            self.readStatusJSON(dsatz)
+                        else:
+                            LOGGER.warning("Status ist ungleich, nicht senden! Hat sich in der letzten Zeit geändert! Letzter Status: " + str(tempstatus))
+                        time.sleep(random.randint(0, 5))
+                    except Exception as ex:
+                        LOGGER.critical("Statuslong absenden < " + str(ex))
+                        LOGDAT.error(str(ex))
+
+        except Exception as ex:
+           LOGGER.critical("Statuslong < " + str(ex))
            LOGDAT.error(str(ex))
            
            NotifyMyDevice.sendmessage(self.mydevice, "Tetracontrol - start", str(ex))
@@ -82,8 +135,8 @@ class TetraControlStatus():
             self.name = (dsatz["name"])
             self.statusman()           
             self.start_time = datetime.now() 
-            out = "Empfangen: " + str(self.issi) + " | " + str(self.status) + " | " + str(self.name)
-            LOGDAT.info(out)
+            out = "[" + str(os.getpid()) + "] " + "[" + self.msgtext +"] Empfangen: " + str(self.issi) + " | " + str(self.status) + " | " + str(self.name)
+            LOGGER.info(out)
             try:
                 self.loadWhitelist()
 
