@@ -81,8 +81,8 @@ def main(status, issi, name, token):
             LOGGER.critical("[" + str(os.getpid()) + "] [Fireboard]" + str(json_response['errors']))
             LOGDAT.critical("[" + str(os.getpid()) + "] [Fireboard]" + str(json_response['errors']))
             return 1
-        LOGGER.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + token[0:10])
-        LOGDAT.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + token[0:10])
+        LOGGER.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + name + " | " + status + " | " + issi + " | " + token[0:10])
+        LOGDAT.debug("[" + str(os.getpid()) + "]" + " [Fireboard] gesendet " + name + " | " + status + " | " + issi + " | " + token[0:10])
         time_elapsed = datetime.now() - start_time 
         LOGGER.debug("[" + str(os.getpid()) + "]" + ' [Dauer] Fireboard senden: {}'.format(time_elapsed))
         LOGDAT.debug("[" + str(os.getpid()) + "]" + ' [Dauer] Fireboard senden: {}'.format(time_elapsed))

@@ -28,6 +28,7 @@ class StartStatusToAPI():
         self.status = status
         self.issi = issi
         self.name = name
+        LOGGER.info("[" + str(os.getpid()) + "] " + "[API] Prüfe senden: " + self.name + " | " + self.status + " | " + self.issi)
         self.readConfig()
         self.loadStatusToAPI()
 
@@ -46,8 +47,7 @@ class StartStatusToAPI():
             self.path_items = self.config.items("SendToAPI")
             for key, token in self.path_items: 
                 self.url = token
-                LOGGER.debug("StatusToAPI-Token: " + self.url)
-                self.StatusStatusToAPI()          
+                self.sendStatustoAPI()        
         except Exception as ex:
             LOGGER.error("startStatusToAPI" +str(ex))
             LOGDAT.error(str(ex))
@@ -66,16 +66,9 @@ class StartStatusToAPI():
         except:
             pass
 
+        LOGGER.debug("StatusToAPI-Token: " + self.url)
+
         subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusSENDTOAPI.py", self.url], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        
-
-    def StatusStatusToAPI(self):  #return statuscode (Http-Fehler-Code)
-        try:
-            url = (f"https://www.divera247.com/api/fms?status_id=" + self.status + "&vehicle_issi=" + (str(self.issi)) + '&accesskey=' + self.url)
-            subprocess.Popen(["python3", "/var/StatusClient/lib/pid_statusStatusToAPI.py", self.status, url, self.name, self.url], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        
-        except Exception as ex:
-            LOGGER.error("tetracontrolstatus" + "[" + str(os.getpid()) + "] " + str(ex))
-            
+                 
 StartStatusToAPI(status = sys.argv[1], issi= sys.argv[2], name = sys.argv[3])

@@ -6,7 +6,7 @@ from createconfig import createConfigFile
 from notifymydevice import NotifyMyDevice
 from logfunc import init_logging, loggingdatei
 from tetracontrolstatus import TetraControlStatus
-import logging, socket
+import logging, socket, os
 from FeuerSoftVehicle import FeuerSoftVehicle
 import schedule, time, configparser, ctypes
 
@@ -23,15 +23,34 @@ def pid_status():
     #LOGGER.debug('SUBPROCESS stdout: ' + str(out.decode()))
 
 def pid_statuslong():
-    p = subprocess.Popen([sys.executable, "/var/StatusClient/pid_statuslong.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out, err = p.communicate()
+    if checkRAM() < 65:
+        p = subprocess.Popen([sys.executable, "/var/StatusClient/pid_statuslong.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        out, err = p.communicate()
+    else:
+        LOGGER.warning("Status 6h Rückwirkend abfragen gestoppt, RAM ist zu voll!")
 
 def pid_heathchecks():
     subprocess.Popen([sys.executable, "/var/StatusClient/pid_heathchecks.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def pid_checkFeuerSoftCehicle():
-    LOGGER.debug("pid_checkFeuerSoftCehicle start")
-    subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if checkRAM() < 50:
+        LOGGER.debug("pid_checkFeuerSoftCehicle start")
+        subprocess.Popen([sys.executable, "/var/StatusClient/pid_checkFeuerSoftCehicle.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    else:
+        LOGGER.warning("Feuersoftware Fahrzeuge werden nicht geholt, RAM ist zu voll!")
+def checkRAM():
+    total_memory, used_memory, free_memory = map(
+        int, os.popen('free -t -m').readlines()[-1].split()[1:])
+    ramusefloat = round((used_memory/total_memory) * 100, 2)
+    ramusestr = str(ramusefloat)
+
+    if ramusefloat > 70:
+        LOGGER.critical("RAM ist zu voll! Über 70%")
+        LOGGER.critical("Software wird beendet! Danach neu gestartet!")
+        subprocess.Popen([sys.executable, "/var/StatusClient/main.py"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        sys.exit(0)
+
+    return ramusefloat
 
 def startclient():
     
@@ -45,6 +64,7 @@ def startclient():
     TetraControlStatus.checkTC(prog)
     
     schedule.every(1).seconds.do(pid_status)
+    schedule.every(5).seconds.do(checkRAM)
     schedule.every(6).hours.do(pid_statuslong)
     schedule.every(5).minutes.do(TetraControlStatus.checkTC, prog)
     schedule.every(1).minutes.do(pid_heathchecks)

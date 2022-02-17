@@ -29,6 +29,7 @@ class StartDivera():
         self.status = status
         self.issi = issi
         self.name = name
+        LOGGER.info("[" + str(os.getpid()) + "] " + "[Divera] Prüfe senden: " + self.name + " | " + self.status + " | " + self.issi)
         self.readConfig()
         self.loadDivera()
 

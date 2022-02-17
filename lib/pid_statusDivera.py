@@ -48,8 +48,6 @@ try:
         r = requests.post(url, timeout = 60) 
         DiveraStatusCode(r)
         time_elapsed = datetime.now() - start_time 
-        LOGGER.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
-        LOGDAT.debug("[" + str(os.getpid()) + "] " + '[Dauer] Verarbeitung Status: {}'.format(time_elapsed))
         msg = (str(name) + " | Info: " + str(r.status_code) + " | Status: " + status + ' | Dauer: {}'.format(time_elapsed))
         LOGGER.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)  
         LOGDAT.debug("[" + str(os.getpid()) + "] " + "[Divera] " + token[0:10] + " " + msg)

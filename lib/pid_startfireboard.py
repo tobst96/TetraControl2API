@@ -1,4 +1,4 @@
-import logging, chromalog, sys, subprocess, configparser
+import logging, chromalog, sys, subprocess, configparser, os
 
 from pygelf import GelfUdpHandler
 
@@ -28,6 +28,7 @@ class sendStatusToFireboard:
         self.issi = issi
         self.status = status
         self.name = name
+        LOGGER.info("[" + str(os.getpid()) + "] " + "[Fireboard] Prüfe senden: " + self.name + " | " + self.status + " | " + self.issi)
         self.readConfig()
         self.searchToken()
 

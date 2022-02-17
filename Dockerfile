@@ -17,9 +17,7 @@ WORKDIR /var/StatusClient
 COPY /src /var/StatusClient
 COPY /lib /var/StatusClient/lib
 
-RUN mkdir /var/StatusClient/StatusAPI
 RUN chmod 777 /var/StatusClient
 RUN chmod 777 /var/StatusClient/lib
-RUN chmod 777 /var/StatusClient/StatusAPI
 
 CMD [ "python3", "main.py" ]
